@@ -1,0 +1,23 @@
+# Node modules
+node_modules/
+**/node_modules/
+
+# Production builds
+dist/
+**/dist/
+
+# Local env files
+.env
+.env.local
+**/ .env
+**/.env
+
+# IDE and OS files
+.DS_Store
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

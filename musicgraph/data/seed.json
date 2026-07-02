@@ -1,0 +1,54 @@
+{
+  "artists": [
+    {
+      "mbid": "056e6f16-0730-4db2-a8c6-e6308cf26b90",
+      "name": "Daft Punk",
+      "type": "Group",
+      "country": "FR",
+      "beginDate": "1993",
+      "endDate": "2021",
+      "disambiguation": "French electronic music duo",
+      "genres": ["electronic", "funk"]
+    },
+    {
+      "mbid": "c72df37b-9442-45e3-99b6-bfd43c7b399b",
+      "name": "Pharrell Williams",
+      "type": "Person",
+      "country": "US",
+      "beginDate": "1992",
+      "genres": ["pop", "funk"]
+    },
+    {
+      "mbid": "704b4c79-b1d5-4c0a-ad20-043586c99c85",
+      "name": "Angèle",
+      "type": "Person",
+      "country": "BE",
+      "beginDate": "2015",
+      "genres": ["pop"]
+    },
+    {
+      "mbid": "8b746d0a-9d62-430c-ab23-f36bc6499c85",
+      "name": "Damso",
+      "type": "Person",
+      "country": "CD",
+      "beginDate": "2006",
+      "genres": ["rap", "hip hop"]
+    }
+  ],
+  "collaborations": [
+    {
+      "artist1": "Daft Punk",
+      "artist2": "Pharrell Williams",
+      "track": "Get Lucky",
+      "release": "Random Access Memories",
+      "year": "2013"
+    },
+    {
+      "artist1": "Angèle",
+      "artist2": "Damso",
+      "track": "Démons",
+      "release": "Nonante-Cinq",
+      "year": "2021"
+    }
+  ]
+}
