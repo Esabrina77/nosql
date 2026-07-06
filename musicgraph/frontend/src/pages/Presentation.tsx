@@ -51,13 +51,13 @@ export const Presentation: React.FC<PresentationProps> = ({ setPage }) => {
             <text x="120" y="150" fill="#10b981" fontSize="8" fontWeight="bold">FROM_AREA</text>
 
             <path d="M 275 95 L 420 95" stroke="#64748b" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-            <text x="290" y="85" fill="#a855f7" fontSize="8" fontWeight="bold">PERFORMED / FEATURED_ON</text>
+            <text x="290" y="85" fill="#e11d48" fontSize="8" fontWeight="bold">PERFORMED / FEATURED_ON</text>
 
-            <path d="M 230 60 C 210 20, 270 20, 250 60" stroke="#a855f7" strokeWidth="1.5" fill="none" markerEnd="url(#arrow)" />
-            <text x="180" y="15" fill="#a855f7" fontSize="8" fontWeight="bold">COLLABORATED_WITH</text>
+            <path d="M 230 60 C 210 20, 270 20, 250 60" stroke="#e11d48" strokeWidth="1.5" fill="none" markerEnd="url(#arrow)" />
+            <text x="180" y="15" fill="#e11d48" fontSize="8" fontWeight="bold">COLLABORATED_WITH</text>
 
             <path d="M 495 95 L 640 95" stroke="#64748b" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-            <text x="530" y="85" fill="#3b82f6" fontSize="8" fontWeight="bold">APPEARS_ON</text>
+            <text x="530" y="85" fill="#2563eb" fontSize="8" fontWeight="bold">APPEARS_ON</text>
 
             <path d="M 715 95 L 795 95" stroke="#64748b" strokeWidth="1.5" fill="none" markerEnd="url(#arrow)" />
             <text x="725" y="85" fill="#f97316" fontSize="8" fontWeight="bold">RELEASED_BY</text>
@@ -79,13 +79,13 @@ export const Presentation: React.FC<PresentationProps> = ({ setPage }) => {
             </g>
 
             <g transform="translate(245, 95)">
-              <circle r="24" fill="#0f172a" stroke="#a855f7" strokeWidth="2.5" style={{ filter: 'drop-shadow(0px 0px 6px rgba(168, 85, 247, 0.5))' }} />
+              <circle r="24" fill="#0f172a" stroke="#e11d48" strokeWidth="2.5" style={{ filter: 'drop-shadow(0px 0px 6px rgba(225, 29, 72, 0.5))' }} />
               <text textAnchor="middle" dy="3" fill="#f8fafc" fontSize="10" fontWeight="bold">Artist</text>
               <text textAnchor="middle" y="36" fill="#94a3b8" fontSize="8">mbid, name, country</text>
             </g>
 
             <g transform="translate(460, 95)">
-              <circle r="24" fill="#0f172a" stroke="#3b82f6" strokeWidth="2.5" style={{ filter: 'drop-shadow(0px 0px 6px rgba(59, 130, 246, 0.5))' }} />
+              <circle r="24" fill="#0f172a" stroke="#2563eb" strokeWidth="2.5" style={{ filter: 'drop-shadow(0px 0px 6px rgba(37, 99, 235, 0.5))' }} />
               <text textAnchor="middle" dy="3" fill="#f8fafc" fontSize="9" fontWeight="bold">Track</text>
               <text textAnchor="middle" y="36" fill="#94a3b8" fontSize="8">mbid, title, length</text>
             </g>
