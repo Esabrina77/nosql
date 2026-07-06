@@ -4,11 +4,11 @@ import { runQuery } from '../services/neo4j';
 
 const router = Router();
 
-// ==========================================
-// 1. Artist Search & Import Endpoints
-// ==========================================
+const toNum = (val: any): number => {
+  if (val === null || val === undefined) return 0;
+  return typeof val === 'number' ? val : (val && typeof val.toNumber === 'function' ? val.toNumber() : Number(val));
+};
 
-// GET /api/search/artists - Search MusicBrainz artists
 router.get('/search/artists', async (req: Request, res: Response) => {
   const query = req.query.q as string;
   if (!query) {
@@ -22,7 +22,6 @@ router.get('/search/artists', async (req: Request, res: Response) => {
   }
 });
 
-// POST /api/import/artists - Import artist into Neo4j
 router.post('/import/artists', async (req: Request, res: Response) => {
   const { mbid } = req.body;
   if (!mbid) {
@@ -31,10 +30,9 @@ router.post('/import/artists', async (req: Request, res: Response) => {
 
   try {
     console.log(`Starting import for artist MBID: ${mbid}`);
-    
-    // 1. Fetch details from MusicBrainz
+
     const details = await musicbrainz.getArtistDetails(mbid);
-    
+
     const artistData = {
       mbid: details.id,
       name: details.name,
@@ -46,7 +44,6 @@ router.post('/import/artists', async (req: Request, res: Response) => {
       disambiguation: details.disambiguation || null
     };
 
-    // 2. Merge Artist node in Neo4j
     await runQuery(`
       MERGE (a:Artist {mbid: $mbid})
       SET a.name = $name,
@@ -59,7 +56,6 @@ router.post('/import/artists', async (req: Request, res: Response) => {
       RETURN a
     `, artistData);
 
-    // 3. Create Area node if present
     if (details.area) {
       await runQuery(`
         MATCH (a:Artist {mbid: $artistMbid})
@@ -75,7 +71,6 @@ router.post('/import/artists', async (req: Request, res: Response) => {
       });
     }
 
-    // 4. Create Genre nodes if present
     if (details.genres && details.genres.length > 0) {
       for (const g of details.genres) {
         await runQuery(`
@@ -89,7 +84,6 @@ router.post('/import/artists', async (req: Request, res: Response) => {
       }
     }
 
-    // 5. Fetch recordings and releases of this artist (limit 40 for responsiveness)
     const recordings = await musicbrainz.getArtistRecordings(mbid);
     const recordingsToProcess = recordings.slice(0, 40);
 
@@ -99,7 +93,6 @@ router.post('/import/artists', async (req: Request, res: Response) => {
       const recLength = rec.length || null;
       const recFirstReleaseDate = rec['first-release-date'] || null;
 
-      // Merge Recording
       await runQuery(`
         MERGE (r:Recording {mbid: $mbid})
         SET r.title = $title,
@@ -114,7 +107,6 @@ router.post('/import/artists', async (req: Request, res: Response) => {
         firstReleaseDate: recFirstReleaseDate
       });
 
-      // Handle Artist Credits (Performers & Collaborations)
       if (rec['artist-credit']) {
         const credits = rec['artist-credit'];
         for (const credit of credits) {
@@ -125,7 +117,6 @@ router.post('/import/artists', async (req: Request, res: Response) => {
             const credCountry = credit.artist.country || 'Unknown';
             const joinPhrase = credit.joinphrase || '';
 
-            // Merge Collaborator Artist Node (might be a stub that gets filled later if imported)
             await runQuery(`
               MERGE (ca:Artist {mbid: $mbid})
               ON CREATE SET ca.name = $name, ca.type = $type, ca.country = $country
@@ -136,10 +127,9 @@ router.post('/import/artists', async (req: Request, res: Response) => {
               country: credCountry
             });
 
-            // Detect relation type: PERFORMED or FEATURED_ON
             const isFeature = /feat\.|featuring|ft\.|avec| x | & /.test(joinPhrase.toLowerCase()) || 
                               /feat\.|featuring|ft\.|avec| x | & /.test(recTitle.toLowerCase());
-            
+
             const relType = isFeature ? 'FEATURED_ON' : 'PERFORMED';
 
             await runQuery(`
@@ -151,7 +141,6 @@ router.post('/import/artists', async (req: Request, res: Response) => {
               recordingMbid: recMbid
             });
 
-            // If it's a collaborator (different artist), link them
             if (credMbid !== artistData.mbid) {
               await runQuery(`
                 MATCH (a1:Artist {mbid: $mbid1})
@@ -166,9 +155,8 @@ router.post('/import/artists', async (req: Request, res: Response) => {
         }
       }
 
-      // Handle Releases associated with this recording
       if (rec.releases && rec.releases.length > 0) {
-        const rel = rec.releases[0]; // Take first release
+        const rel = rec.releases[0];
         const relMbid = rel.id;
         const relTitle = rel.title;
         const relDate = rel.date || null;
@@ -176,7 +164,6 @@ router.post('/import/artists', async (req: Request, res: Response) => {
         const relStatus = rel.status || 'Official';
         const relType = rel['release-group']?.['primary-type'] || 'Album';
 
-        // Merge Release
         await runQuery(`
           MERGE (rel:Release {mbid: $mbid})
           SET rel.title = $title,
@@ -194,7 +181,6 @@ router.post('/import/artists', async (req: Request, res: Response) => {
           releaseType: relType
         });
 
-        // Link Recording to Release
         await runQuery(`
           MATCH (rec:Recording {mbid: $recMbid})
           MATCH (rel:Release {mbid: $relMbid})
@@ -204,7 +190,6 @@ router.post('/import/artists', async (req: Request, res: Response) => {
           relMbid
         });
 
-        // Link Release to Area (if country code present)
         if (relCountry) {
           await runQuery(`
             MATCH (rel:Release {mbid: $relMbid})
@@ -216,7 +201,6 @@ router.post('/import/artists', async (req: Request, res: Response) => {
           });
         }
 
-        // Link Label relation if present in label-info
         if (rel['label-info'] && rel['label-info'].length > 0) {
           for (const info of rel['label-info']) {
             if (info.label) {
@@ -249,11 +233,6 @@ router.post('/import/artists', async (req: Request, res: Response) => {
   }
 });
 
-// ==========================================
-// 2. Artist Explorer Endpoints
-// ==========================================
-
-// GET /api/artists - List all imported artists
 router.get('/artists', async (req: Request, res: Response) => {
   try {
     const result = await runQuery(`
@@ -275,7 +254,6 @@ router.get('/artists', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/artists/:id - Specific artist details
 router.get('/artists/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
@@ -305,7 +283,6 @@ router.get('/artists/:id', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/artists/:id/recordings - Get recordings for artist
 router.get('/artists/:id/recordings', async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
@@ -325,7 +302,6 @@ router.get('/artists/:id/recordings', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/artists/:id/releases - Get releases for artist
 router.get('/artists/:id/releases', async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
@@ -342,7 +318,6 @@ router.get('/artists/:id/releases', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/artists/:id/collaborations - Collaborations of artist
 router.get('/artists/:id/collaborations', async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
@@ -362,11 +337,6 @@ router.get('/artists/:id/collaborations', async (req: Request, res: Response) =>
   }
 });
 
-// ==========================================
-// 3. Recording Endpoints
-// ==========================================
-
-// GET /api/recordings - List recordings
 router.get('/recordings', async (req: Request, res: Response) => {
   try {
     const result = await runQuery(`
@@ -380,7 +350,6 @@ router.get('/recordings', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/recordings/:id - Recording details
 router.get('/recordings/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
@@ -395,7 +364,6 @@ router.get('/recordings/:id', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/recordings/:id/artists - Artists on recording
 router.get('/recordings/:id/artists', async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
@@ -413,7 +381,6 @@ router.get('/recordings/:id/artists', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/recordings/:id/releases - Releases containing recording
 router.get('/recordings/:id/releases', async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
@@ -428,11 +395,6 @@ router.get('/recordings/:id/releases', async (req: Request, res: Response) => {
   }
 });
 
-// ==========================================
-// 4. Release Endpoints
-// ==========================================
-
-// GET /api/releases
 router.get('/releases', async (req: Request, res: Response) => {
   try {
     const result = await runQuery(`MATCH (r:Release) RETURN r LIMIT 100`);
@@ -442,7 +404,6 @@ router.get('/releases', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/releases/:id
 router.get('/releases/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
@@ -454,7 +415,6 @@ router.get('/releases/:id', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/releases/:id/recordings
 router.get('/releases/:id/recordings', async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
@@ -468,7 +428,6 @@ router.get('/releases/:id/recordings', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/releases/:id/artists
 router.get('/releases/:id/artists', async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
@@ -482,11 +441,6 @@ router.get('/releases/:id/artists', async (req: Request, res: Response) => {
   }
 });
 
-// ==========================================
-// 5. Graph Explorer Endpoints
-// ==========================================
-
-// GET /api/graph - Full network graph (nodes and links)
 router.get('/graph', async (req: Request, res: Response) => {
   try {
     const nodesResult = await runQuery(`
@@ -521,7 +475,6 @@ router.get('/graph', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/graph/artists/:id - Ego Network
 router.get('/graph/artists/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
@@ -558,7 +511,6 @@ router.get('/graph/artists/:id', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/graph/collaborations - List of collaborations
 router.get('/graph/collaborations', async (req: Request, res: Response) => {
   try {
     const result = await runQuery(`
@@ -576,11 +528,69 @@ router.get('/graph/collaborations', async (req: Request, res: Response) => {
   }
 });
 
-// ==========================================
-// 6. Statistics Endpoints
-// ==========================================
+router.get('/graph/path', async (req: Request, res: Response) => {
+  const { source, target } = req.query;
+  if (!source || !target) {
+    return res.status(400).json({ error: 'Parameters "source" and "target" are required' });
+  }
 
-// GET /api/stats/overview - Overall Stats
+  if (source === target) {
+    try {
+      const singleNodeResult = await runQuery(`
+        MATCH (a:Artist {mbid: $source})
+        RETURN id(a) as id, labels(a)[0] as type, properties(a) as props
+      `, { source });
+      if (singleNodeResult.records.length === 0) {
+        return res.json({ nodes: [], edges: [] });
+      }
+      const rec = singleNodeResult.records[0];
+      const node = {
+        id: rec.get('id').toString(),
+        type: rec.get('type'),
+        label: rec.get('props').name || rec.get('props').title || rec.get('props').mbid,
+        properties: rec.get('props')
+      };
+      return res.json({ nodes: [node], edges: [] });
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
+  try {
+    const result = await runQuery(`
+      MATCH (a:Artist {mbid: $source}), (b:Artist {mbid: $target})
+      MATCH path = shortestPath((a)-[*..6]-(b))
+      RETURN [n IN nodes(path) | {id: id(n), type: labels(n)[0], label: coalesce(n.name, n.title, n.mbid), properties: properties(n)}] as nodes,
+             [r IN relationships(path) | {source: id(startNode(r)), target: id(endNode(r)), type: type(r)}] as edges
+    `, { source, target });
+
+    if (result.records.length === 0 || !result.records[0].get('nodes')) {
+      return res.json({ nodes: [], edges: [] });
+    }
+
+    const rec = result.records[0];
+    const nodes = rec.get('nodes');
+    const edges = rec.get('edges');
+
+    const formattedNodes = nodes.map((n: any) => ({
+      id: n.id.toString(),
+      type: n.type,
+      label: n.label,
+      properties: n.properties
+    }));
+
+    const formattedEdges = edges.map((e: any) => ({
+      source: e.source.toString(),
+      target: e.target.toString(),
+      type: e.type
+    }));
+
+    res.json({ nodes: formattedNodes, edges: formattedEdges });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 router.get('/stats/overview', async (req: Request, res: Response) => {
   try {
     const result = await runQuery(`
@@ -589,24 +599,23 @@ router.get('/stats/overview', async (req: Request, res: Response) => {
       MATCH (rel:Release) WITH totalArtists, totalRecordings, count(rel) as totalReleases
       MATCH (g:Genre) WITH totalArtists, totalRecordings, totalReleases, count(g) as totalGenres
       MATCH (ar:Area) WITH totalArtists, totalRecordings, totalReleases, totalGenres, count(ar) as totalAreas
-      MATCH ()-[c:COLLABORATED_WITH]->() WITH totalArtists, totalRecordings, totalReleases, totalGenres, totalAreas, count(c)/2 as totalCollaborations
+      MATCH ()-[c:COLLABORATED_WITH]->() WITH totalArtists, totalRecordings, totalReleases, totalGenres, totalAreas, count(c) as totalCollaborations
       RETURN totalArtists, totalRecordings, totalReleases, totalGenres, totalAreas, totalCollaborations
     `);
     const rec = result.records[0];
     res.json({
-      totalArtists: rec.get('totalArtists').toNumber(),
-      totalRecordings: rec.get('totalRecordings').toNumber(),
-      totalReleases: rec.get('totalReleases').toNumber(),
-      totalGenres: rec.get('totalGenres').toNumber(),
-      totalAreas: rec.get('totalAreas').toNumber(),
-      totalCollaborations: rec.get('totalCollaborations').toNumber()
+      totalArtists: toNum(rec.get('totalArtists')),
+      totalRecordings: toNum(rec.get('totalRecordings')),
+      totalReleases: toNum(rec.get('totalReleases')),
+      totalGenres: toNum(rec.get('totalGenres')),
+      totalAreas: toNum(rec.get('totalAreas')),
+      totalCollaborations: toNum(rec.get('totalCollaborations'))
     });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// GET /api/stats/top-collaborations - Most active collaborations
 router.get('/stats/top-collaborations', async (req: Request, res: Response) => {
   try {
     const result = await runQuery(`
@@ -618,14 +627,13 @@ router.get('/stats/top-collaborations', async (req: Request, res: Response) => {
     res.json(result.records.map(rec => ({
       artist1: { mbid: rec.get('artist1Mbid'), name: rec.get('artist1Name') },
       artist2: { mbid: rec.get('artist2Mbid'), name: rec.get('artist2Name') },
-      collaborationsCount: rec.get('count').toNumber()
+      collaborationsCount: toNum(rec.get('count'))
     })));
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// GET /api/stats/top-artists - Centrality
 router.get('/stats/top-artists', async (req: Request, res: Response) => {
   try {
     const result = await runQuery(`
@@ -636,14 +644,13 @@ router.get('/stats/top-artists', async (req: Request, res: Response) => {
     res.json(result.records.map(rec => ({
       mbid: rec.get('mbid'),
       name: rec.get('name'),
-      collaboratorsCount: rec.get('degree').toNumber()
+      collaboratorsCount: toNum(rec.get('degree'))
     })));
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// GET /api/stats/top-genres
 router.get('/stats/top-genres', async (req: Request, res: Response) => {
   try {
     const result = await runQuery(`
@@ -653,7 +660,26 @@ router.get('/stats/top-genres', async (req: Request, res: Response) => {
     `);
     res.json(result.records.map(rec => ({
       genre: rec.get('genre'),
-      count: rec.get('artistCount').toNumber()
+      count: toNum(rec.get('artistCount'))
+    })));
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/stats/top-recordings', async (req: Request, res: Response) => {
+  try {
+    const result = await runQuery(`
+      MATCH (a:Artist)-[:PERFORMED|FEATURED_ON]->(r:Recording)
+      WITH r, count(a) as artistCount, collect(a.name) as artistsNames
+      RETURN r.mbid as mbid, r.title as title, artistCount, artistsNames
+      ORDER BY artistCount DESC LIMIT 10
+    `);
+    res.json(result.records.map(rec => ({
+      mbid: rec.get('mbid'),
+      title: rec.get('title'),
+      artistCount: toNum(rec.get('artistCount')),
+      artists: rec.get('artistsNames')
     })));
   } catch (error: any) {
     res.status(500).json({ error: error.message });

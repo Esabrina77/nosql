@@ -41,7 +41,7 @@ docker compose up --build
 
 Vous pouvez importer des artistes directement depuis l'onglet **Rechercher** du site Web.
 
-Alternativement, pour alimenter instantanément votre base de données Neo4j avec un jeu de données réel et connecté (comprenant *Daft Punk, Stromae, Angèle, Damso, Pharrell Williams, The Weeknd, Kanye West*), vous pouvez copier et exécuter le contenu du script [seed.cypher](file:///c:/Users/kapor/Desktop/no-sql/musicgraph/data/seed.cypher) directement dans la console web Neo4j Browser (`http://localhost:7474`).
+Alternativement, pour alimenter instantanément votre base de données Neo4j avec un jeu de données réel et connecté (comprenant *Daft Punk, Stromae, Angèle, Damso, Pharrell Williams, The Weeknd, Kanye West*), vous pouvez copier et exécuter le contenu du script [seed.cypher](data/seed.cypher) directement dans la console web Neo4j Browser (`http://localhost:7474`).
 
 ---
 
@@ -88,4 +88,18 @@ ORDER BY collaborationsCount DESC LIMIT 10;
 MATCH (g:Genre)<-[:ASSOCIATED_WITH_GENRE]-(a:Artist)
 RETURN g.name, count(a) as artistCount
 ORDER BY artistCount DESC;
+```
+
+### 4. Quels morceaux (Recordings) sont les plus collaboratifs (le plus d'artistes impliqués) ?
+```cypher
+MATCH (a:Artist)-[:PERFORMED|FEATURED_ON]->(r:Recording)
+WITH r, count(a) as artistCount, collect(a.name) as artists
+RETURN r.title, artistCount, artists
+ORDER BY artistCount DESC LIMIT 10;
+```
+
+### 5. Quels chemins relient deux artistes (degrés de séparation) ?
+```cypher
+MATCH path = shortestPath((a:Artist {name: "Stromae"})-[*..6]-(b:Artist {name: "Daft Punk"}))
+RETURN path;
 ```

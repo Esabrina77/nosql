@@ -33,7 +33,7 @@ Assurez-vous que Docker Desktop est démarré.
 
 ### Démarrage
 
-À la racine du projet (`..\no-sql\musicgraph`), exécutez la commande :
+À la racine du projet, exécutez la commande :
 
 ```bash
 docker compose up --build

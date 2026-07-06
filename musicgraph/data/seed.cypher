@@ -240,6 +240,11 @@ CREATE (one_track:Recording {mbid: "95784f85-48b4-4b51-9dfc-2ec08ee1e1cf", title
 CREATE (pharrell)-[:PERFORMED]->(one_track)
 CREATE (kanye)-[:FEATURED_ON]->(one_track)
 
+// Alors on danse remix (bridges Stromae and Kanye West)
+CREATE (alorsondanse:Recording {mbid: "b5784f85-48b4-4b51-9dfc-2ec08ee1e1cf", title: "Alors on danse (remix)", length: 214000, firstReleaseDate: "2010-08-27", source: "Seed"})
+CREATE (stromae)-[:PERFORMED]->(alorsondanse)
+CREATE (kanye)-[:FEATURED_ON]->(alorsondanse)
+
 // 8. Create Collaborated With Relationships
 CREATE (daft)-[:COLLABORATED_WITH]->(pharrell)
 CREATE (daft)-[:COLLABORATED_WITH]->(rodgers)
@@ -247,4 +252,5 @@ CREATE (pharrell)-[:COLLABORATED_WITH]->(rodgers)
 CREATE (weeknd)-[:COLLABORATED_WITH]->(daft)
 CREATE (angele)-[:COLLABORATED_WITH]->(damso)
 CREATE (stromae)-[:COLLABORATED_WITH]->(damso)
-CREATE (pharrell)-[:COLLABORATED_WITH]->(kanye);
+CREATE (pharrell)-[:COLLABORATED_WITH]->(kanye)
+CREATE (stromae)-[:COLLABORATED_WITH]->(kanye);

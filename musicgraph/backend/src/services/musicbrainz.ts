@@ -3,19 +3,17 @@ import axios from 'axios';
 const BASE_URL = 'https://musicbrainz.org/ws/2';
 const USER_AGENT = 'MusicGraphApp/1.0.0 ( contact@musicgraph.com )';
 
-// Sequential Request Queue: guarantees strictly serial execution with delay
 let requestQueue = Promise.resolve();
 
 async function fetchFromMB(endpoint: string, params: Record<string, any> = {}): Promise<any> {
   return new Promise((resolve, reject) => {
     requestQueue = requestQueue
       .then(async () => {
-        // Enforce 1100ms pause before each call
         await new Promise((r) => setTimeout(r, 1100));
-        
+
         const url = `${BASE_URL}/${endpoint}`;
         console.log(`[MusicBrainz] Fetching: ${url} with params:`, params);
-        
+
         try {
           const response = await axios.get(url, {
             headers: {
@@ -26,7 +24,7 @@ async function fetchFromMB(endpoint: string, params: Record<string, any> = {}): 
               ...params,
               fmt: 'json'
             },
-            timeout: 10000 // 10 seconds timeout
+            timeout: 10000
           });
           resolve(response.data);
         } catch (error: any) {
@@ -38,7 +36,6 @@ async function fetchFromMB(endpoint: string, params: Record<string, any> = {}): 
         }
       })
       .catch((error) => {
-        // Resolve queue chaining to ensure subsequent requests can continue even if one fails
         reject(error);
       });
   });
@@ -57,7 +54,7 @@ export async function searchArtists(query: string): Promise<MBSearchResult[]> {
   try {
     const data = await fetchFromMB('artist', { query, limit: 10 });
     if (!data.artists) return [];
-    
+
     return data.artists.map((art: any) => ({
       mbid: art.id,
       name: art.name,
@@ -74,7 +71,6 @@ export async function searchArtists(query: string): Promise<MBSearchResult[]> {
 
 export async function getArtistDetails(mbid: string) {
   try {
-    // Fetch artist details including genres, tags, area relationships
     const data = await fetchFromMB(`artist/${mbid}`, {
       inc: 'genres+tags+area-rels+label-rels'
     });
@@ -87,13 +83,12 @@ export async function getArtistDetails(mbid: string) {
 
 export async function getArtistRecordings(mbid: string) {
   try {
-    // Fetch up to 15 releases with their nested recordings, artist credits, and labels
     const data = await fetchFromMB('release', {
       artist: mbid,
       limit: 15,
       inc: 'recordings+artist-credits+labels'
     });
-    
+
     const releases = data.releases || [];
     const recordingsMap = new Map<string, any>();
 

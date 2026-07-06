@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Award, Zap, Heart, AlertCircle } from 'lucide-react';
+import { Award, Zap, Heart, Music, AlertCircle } from 'lucide-react';
 
 interface TopArtist {
   mbid: string;
@@ -18,25 +18,35 @@ interface TopGenre {
   count: number;
 }
 
+interface TopRecording {
+  mbid: string;
+  title: string;
+  artistCount: number;
+  artists: string[];
+}
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 export const Stats: React.FC = () => {
   const [topArtists, setTopArtists] = useState<TopArtist[]>([]);
   const [topCollabs, setTopCollabs] = useState<TopCollaboration[]>([]);
   const [topGenres, setTopGenres] = useState<TopGenre[]>([]);
+  const [topRecordings, setTopRecordings] = useState<TopRecording[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [artistsRes, collabsRes, genresRes] = await Promise.all([
+        const [artistsRes, collabsRes, genresRes, recordingsRes] = await Promise.all([
           fetch(`${API_URL}/stats/top-artists`).then(r => r.json()),
           fetch(`${API_URL}/stats/top-collaborations`).then(r => r.json()),
-          fetch(`${API_URL}/stats/top-genres`).then(r => r.json())
+          fetch(`${API_URL}/stats/top-genres`).then(r => r.json()),
+          fetch(`${API_URL}/stats/top-recordings`).then(r => r.json())
         ]);
         setTopArtists(artistsRes);
         setTopCollabs(collabsRes);
         setTopGenres(genresRes);
+        setTopRecordings(recordingsRes);
       } catch (err) {
         console.error('Error fetching stats:', err);
       } finally {
@@ -63,7 +73,7 @@ export const Stats: React.FC = () => {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
-            
+
             {/* Top Artists - Centrality */}
             <div className="glass-card" style={{ padding: '1.5rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
@@ -125,6 +135,31 @@ export const Stats: React.FC = () => {
                 </div>
               )}
             </div>
+
+            {/* Top Tracks / Recordings */}
+            <div className="glass-card" style={{ padding: '1.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                <Music color="#06b6d4" />
+                <h3 style={{ fontSize: '1.25rem' }}>Morceaux les plus collaboratifs</h3>
+              </div>
+              {topRecordings.length === 0 ? (
+                <p style={{ color: 'var(--text-secondary)' }}>Aucune donnée.</p>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {topRecordings.map((r, index) => (
+                    <div key={r.mbid || index} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', padding: '0.5rem 0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '6px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 600 }}>{r.title}</span>
+                        <span className="badge badge-blue">{r.artistCount} artistes</span>
+                      </div>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                        Interprètes : {r.artists.join(', ')}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Graph Analysis & Limits */}
@@ -133,7 +168,7 @@ export const Stats: React.FC = () => {
               <AlertCircle color="var(--accent-primary)" />
               <h2 style={{ fontSize: '1.5rem' }}>Analyse du Graphe et Limites Techniques</h2>
             </div>
-            
+
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6' }}>
               <div>
                 <h3 style={{ color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Centralité et Relations</h3>

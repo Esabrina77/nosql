@@ -31,13 +31,12 @@ const App: React.FC = () => {
 
   return (
     <div className="dashboard-container">
-      {/* Sidebar Navigation */}
       <aside className="sidebar">
         <div className="logo">
           <Radio size={28} color="#a855f7" />
           <span>MusicGraph</span>
         </div>
-        
+
         <nav style={{ flex: 1 }}>
           <ul className="nav-menu">
             <li 
@@ -84,13 +83,12 @@ const App: React.FC = () => {
             </li>
           </ul>
         </nav>
-        
+
         <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
           MusicGraph v1.0.0
         </div>
       </aside>
 
-      {/* Main Content Area */}
       <main className="main-content">
         {currentPage === 'home' && <Home setPage={(p) => navigateToPage(p as PageType)} />}
         {currentPage === 'search' && <Search />}

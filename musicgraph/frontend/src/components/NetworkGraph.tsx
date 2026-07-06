@@ -18,18 +18,18 @@ interface NetworkGraphProps {
   nodes: GraphNode[];
   edges: GraphEdge[];
   onNodeSelect?: (node: GraphNode) => void;
+  physicsEnabled?: boolean;
 }
 
-export const NetworkGraph: React.FC<NetworkGraphProps> = ({ nodes, edges, onNodeSelect }) => {
+export const NetworkGraph: React.FC<NetworkGraphProps> = ({ nodes, edges, onNodeSelect, physicsEnabled }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const networkRef = useRef<Network | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Map internal schema to vis-network nodes
     const visNodes = nodes.map(node => {
-      let color = '#a855f7'; // Purple (Artist)
+      let color = '#a855f7';
       let size = 25;
 
       switch (node.type) {
@@ -38,19 +38,19 @@ export const NetworkGraph: React.FC<NetworkGraphProps> = ({ nodes, edges, onNode
           size = 28;
           break;
         case 'Recording':
-          color = '#3b82f6'; // Blue
+          color = '#3b82f6';
           size = 20;
           break;
         case 'Release':
-          color = '#06b6d4'; // Cyan
+          color = '#06b6d4';
           size = 22;
           break;
         case 'Genre':
-          color = '#eab308'; // Yellow
+          color = '#eab308';
           size = 15;
           break;
         case 'Area':
-          color = '#10b981'; // Green
+          color = '#10b981';
           size = 18;
           break;
       }
@@ -78,7 +78,6 @@ export const NetworkGraph: React.FC<NetworkGraphProps> = ({ nodes, edges, onNode
       };
     });
 
-    // Map internal schema to vis-network edges
     const visEdges = edges.map((edge, idx) => ({
       id: `edge-${idx}`,
       from: edge.source,
@@ -120,6 +119,7 @@ export const NetworkGraph: React.FC<NetworkGraphProps> = ({ nodes, edges, onNode
         }
       },
       physics: {
+        enabled: physicsEnabled !== false,
         barnesHut: {
           gravitationalConstant: -3000,
           centralGravity: 0.3,
@@ -166,7 +166,7 @@ export const NetworkGraph: React.FC<NetworkGraphProps> = ({ nodes, edges, onNode
         networkRef.current = null;
       }
     };
-  }, [nodes, edges]);
+  }, [nodes, edges, physicsEnabled]);
 
   return (
     <div 
