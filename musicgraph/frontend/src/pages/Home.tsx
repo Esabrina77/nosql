@@ -58,19 +58,19 @@ export const Home: React.FC<{ setPage: (page: string) => void }> = ({ setPage })
           </div>
         </div>
 
-        <div className="glass-card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%)', borderColor: 'rgba(168, 85, 247, 0.2)' }}>
+        <div className="glass-card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', background: 'linear-gradient(135deg, rgba(255, 85, 0, 0.08) 0%, rgba(194, 178, 159, 0.04) 100%)', borderColor: 'rgba(255, 85, 0, 0.25)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{ background: 'rgba(168, 85, 247, 0.2)', padding: '0.5rem', borderRadius: '8px' }}>
-              <Compass color="#c084fc" size={24} />
+            <div style={{ background: 'rgba(255, 85, 0, 0.12)', padding: '0.5rem', borderRadius: 'var(--radius-md)' }}>
+              <Compass color="var(--accent-primary)" size={24} />
             </div>
-            <h3 style={{ fontSize: '1.25rem' }}>Actions Rapides</h3>
+            <h3 style={{ fontSize: '1.25rem', fontFamily: 'var(--font-display)' }}>Actions Rapides</h3>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <div style={{ cursor: 'pointer', padding: '0.75rem', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-color)' }} onClick={() => setPage('artists')}>
+            <div style={{ cursor: 'pointer', padding: '0.75rem', borderRadius: 'var(--radius-md)', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)' }} onClick={() => setPage('artists')}>
               <strong>Liste des artistes</strong>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Voir toutes les fiches d'artistes importées.</p>
             </div>
-            <div style={{ cursor: 'pointer', padding: '0.75rem', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-color)' }} onClick={() => setPage('stats')}>
+            <div style={{ cursor: 'pointer', padding: '0.75rem', borderRadius: 'var(--radius-md)', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)' }} onClick={() => setPage('stats')}>
               <strong>Statistiques data</strong>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Top collaborations et centralité des artistes.</p>
             </div>

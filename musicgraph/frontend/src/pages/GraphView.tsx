@@ -247,23 +247,23 @@ export const GraphView: React.FC = () => {
             <h3 style={{ fontSize: '1.1rem', marginBottom: '0.75rem', fontFamily: 'var(--font-display)' }}>Légende du Graphe</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.9rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#a855f7' }}></div>
+                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ff5500' }}></div>
                 <span>Artistes (Artist)</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#3b82f6' }}></div>
+                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#c2b29f' }}></div>
                 <span>Morceaux (Recording)</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#06b6d4' }}></div>
+                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#8a7d6e' }}></div>
                 <span>Albums (Release)</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#eab308' }}></div>
+                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#dfb15b' }}></div>
                 <span>Genres (Genre)</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#10b981' }}></div>
+                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#8f9779' }}></div>
                 <span>Pays (Area)</span>
               </div>
             </div>

@@ -29,28 +29,28 @@ export const NetworkGraph: React.FC<NetworkGraphProps> = ({ nodes, edges, onNode
     if (!containerRef.current) return;
 
     const visNodes = nodes.map(node => {
-      let color = '#a855f7';
+      let color = '#ff5500';
       let size = 25;
 
       switch (node.type) {
         case 'Artist':
-          color = '#a855f7';
+          color = '#ff5500';
           size = 28;
           break;
         case 'Recording':
-          color = '#3b82f6';
+          color = '#c2b29f';
           size = 20;
           break;
         case 'Release':
-          color = '#06b6d4';
+          color = '#8a7d6e';
           size = 22;
           break;
         case 'Genre':
-          color = '#eab308';
+          color = '#dfb15b';
           size = 15;
           break;
         case 'Area':
-          color = '#10b981';
+          color = '#8f9779';
           size = 18;
           break;
       }
@@ -62,7 +62,7 @@ export const NetworkGraph: React.FC<NetworkGraphProps> = ({ nodes, edges, onNode
         size: size,
         color: {
           background: color,
-          border: '#1e293b',
+          border: '#080808',
           highlight: {
             background: color,
             border: '#ffffff'
