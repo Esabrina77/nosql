@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home as HomeIcon, Search as SearchIcon, Users, Music, Share2, BarChart3, Radio } from 'lucide-react';
+import { Home as HomeIcon, Search as SearchIcon, Users, Music, Share2, BarChart3, Radio, Tv } from 'lucide-react';
 import { Home } from './pages/Home';
 import { Search } from './pages/Search';
 import { Artists } from './pages/Artists';
@@ -7,8 +7,9 @@ import { ArtistDetails } from './pages/ArtistDetails';
 import { Recordings } from './pages/Recordings';
 import { GraphView } from './pages/GraphView';
 import { Stats } from './pages/Stats';
+import { Presentation } from './pages/Presentation';
 
-type PageType = 'home' | 'search' | 'artists' | 'recordings' | 'graph' | 'stats' | 'artist-details';
+type PageType = 'home' | 'search' | 'artists' | 'recordings' | 'graph' | 'stats' | 'artist-details' | 'presentation';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
@@ -81,6 +82,14 @@ const App: React.FC = () => {
               <BarChart3 size={20} />
               <span>Analyses & Stats</span>
             </li>
+            <li 
+              className={`nav-item ${currentPage === 'presentation' ? 'active' : ''}`}
+              onClick={() => navigateToPage('presentation')}
+              style={{ borderTop: '1px solid var(--border-color)', marginTop: '0.5rem', paddingTop: '0.75rem' }}
+            >
+              <Tv size={20} color="var(--accent-primary)" />
+              <span style={{ color: 'var(--text-primary)' }}>Présentation Oral</span>
+            </li>
           </ul>
         </nav>
 
@@ -96,6 +105,7 @@ const App: React.FC = () => {
         {currentPage === 'recordings' && <Recordings />}
         {currentPage === 'graph' && <GraphView />}
         {currentPage === 'stats' && <Stats />}
+        {currentPage === 'presentation' && <Presentation setPage={(p) => navigateToPage(p as PageType)} />}
         {currentPage === 'artist-details' && selectedArtistId && (
           <ArtistDetails 
             artistId={selectedArtistId} 
