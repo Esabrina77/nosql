@@ -25,7 +25,7 @@ export const GraphView: React.FC = () => {
   const [graphData, setGraphData] = useState<GraphData | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedNode, setSelectedNode] = useState<NodeDetails | null>(null);
-  
+
   const [artists, setArtists] = useState<ArtistSimple[]>([]);
   const [sourceMbid, setSourceMbid] = useState('');
   const [targetMbid, setTargetMbid] = useState('');
@@ -36,9 +36,8 @@ export const GraphView: React.FC = () => {
     Artist: true,
     Recording: true,
     Release: true,
-    Genre: false,
-    Area: false,
-    Label: false
+    Genre: true,
+    Area: true
   });
   const [physicsEnabled, setPhysicsEnabled] = useState(true);
 
@@ -97,13 +96,13 @@ export const GraphView: React.FC = () => {
       });
   };
 
-  const filteredNodes = graphData 
-    ? graphData.nodes.filter(n => filterTypes[n.type as keyof typeof filterTypes]) 
+  const filteredNodes = graphData
+    ? graphData.nodes.filter(n => filterTypes[n.type as keyof typeof filterTypes])
     : [];
 
   const visibleNodeIds = new Set(filteredNodes.map(n => n.id));
-  
-  const filteredEdges = graphData 
+
+  const filteredEdges = graphData
     ? graphData.edges.filter(e => visibleNodeIds.has(e.source) && visibleNodeIds.has(e.target))
     : [];
 
@@ -120,8 +119,8 @@ export const GraphView: React.FC = () => {
         <div className="glass-card" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', padding: '0.75rem 1rem', background: 'rgba(255,255,255,0.02)' }}>
           <Route size={18} color="var(--accent-primary)" />
           <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Chemin :</span>
-          <select 
-            value={sourceMbid} 
+          <select
+            value={sourceMbid}
             onChange={(e) => setSourceMbid(e.target.value)}
             style={{ padding: '0.35rem 0.5rem', background: '#0a0e17', border: '1px solid var(--border-color)', borderRadius: '6px', color: '#fff', fontSize: '0.8rem', outline: 'none', flex: 1 }}
           >
@@ -129,24 +128,24 @@ export const GraphView: React.FC = () => {
             {artists.map(a => <option key={a.mbid} value={a.mbid}>{a.name}</option>)}
           </select>
           <span style={{ color: 'var(--text-muted)' }}>➔</span>
-          <select 
-            value={targetMbid} 
+          <select
+            value={targetMbid}
             onChange={(e) => setTargetMbid(e.target.value)}
             style={{ padding: '0.35rem 0.5rem', background: '#0a0e17', border: '1px solid var(--border-color)', borderRadius: '6px', color: '#fff', fontSize: '0.8rem', outline: 'none', flex: 1 }}
           >
             <option value="">-- Artiste B --</option>
             {artists.map(a => <option key={a.mbid} value={a.mbid}>{a.name}</option>)}
           </select>
-          <button 
+          <button
             onClick={handleFindPath}
             disabled={!sourceMbid || !targetMbid || pathLoading}
-            style={{ 
-              background: 'var(--accent-primary)', 
-              color: 'white', 
-              border: 'none', 
-              borderRadius: '6px', 
-              padding: '0.35rem 0.75rem', 
-              fontSize: '0.8rem', 
+            style={{
+              background: 'var(--accent-primary)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              padding: '0.35rem 0.75rem',
+              fontSize: '0.8rem',
               cursor: (!sourceMbid || !targetMbid || pathLoading) ? 'not-allowed' : 'pointer',
               opacity: (!sourceMbid || !targetMbid || pathLoading) ? 0.6 : 1
             }}
@@ -154,15 +153,15 @@ export const GraphView: React.FC = () => {
             {pathLoading ? 'Calcul...' : 'Lancer'}
           </button>
           {isPathMode && (
-            <button 
+            <button
               onClick={handleResetGraph}
-              style={{ 
-                background: 'transparent', 
-                color: 'var(--text-primary)', 
-                border: '1px solid var(--border-color)', 
-                borderRadius: '6px', 
-                padding: '0.35rem 0.75rem', 
-                fontSize: '0.8rem', 
+              style={{
+                background: 'transparent',
+                color: 'var(--text-primary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '6px',
+                padding: '0.35rem 0.75rem',
+                fontSize: '0.8rem',
                 cursor: 'pointer'
               }}
             >
@@ -177,9 +176,9 @@ export const GraphView: React.FC = () => {
             <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Afficher :</span>
             {Object.keys(filterTypes).map((type) => (
               <label key={type} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8rem', cursor: 'pointer', marginRight: '0.25rem' }}>
-                <input 
-                  type="checkbox" 
-                  checked={filterTypes[type as keyof typeof filterTypes]} 
+                <input
+                  type="checkbox"
+                  checked={filterTypes[type as keyof typeof filterTypes]}
                   onChange={(e) => setFilterTypes({
                     ...filterTypes,
                     [type]: e.target.checked
@@ -279,12 +278,12 @@ export const GraphView: React.FC = () => {
               <Info size={18} color="var(--accent-primary)" />
               <h3 style={{ fontSize: '1.1rem', fontFamily: 'var(--font-display)' }}>Inspecteur de Nœud</h3>
             </div>
-            
+
             {selectedNode ? (
               <div>
                 <span className="badge badge-purple" style={{ marginBottom: '0.5rem' }}>{selectedNode.type}</span>
                 <h4 style={{ fontSize: '1.2rem', marginBottom: '0.75rem' }}>{selectedNode.label}</h4>
-                
+
                 <div style={{ fontSize: '0.85rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', borderTop: '1px solid var(--border-color)', paddingTop: '0.75rem' }}>
                   {selectedNode.type === 'Artist' && (
                     <>
@@ -344,14 +343,14 @@ export const GraphView: React.FC = () => {
                       <div><span style={{ color: 'var(--text-muted)' }}>Type géographique :</span> {selectedNode.properties.type || 'N/A'}</div>
                     </>
                   )}
-                  
+
                   {selectedNode.type === 'Label' && (
                     <>
                       <div><span style={{ color: 'var(--text-muted)' }}>Nom :</span> {selectedNode.properties.name}</div>
                       <div><span style={{ color: 'var(--text-muted)' }}>Pays :</span> {selectedNode.properties.country || 'N/A'}</div>
                     </>
                   )}
-                  
+
                   <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-muted)', borderTop: '1px dashed var(--border-color)', paddingTop: '0.5rem', wordBreak: 'break-all' }}>
                     <strong>ID unique :</strong> {selectedNode.properties.mbid || 'N/A'}
                   </div>
