@@ -37,7 +37,8 @@ export const GraphView: React.FC = () => {
     Recording: true,
     Release: true,
     Genre: true,
-    Area: true
+    Area: true,
+    Label: false
   });
   const [physicsEnabled, setPhysicsEnabled] = useState(true);
 

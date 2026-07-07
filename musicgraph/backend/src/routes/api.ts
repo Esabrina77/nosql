@@ -560,7 +560,7 @@ router.get('/graph/path', async (req: Request, res: Response) => {
   try {
     const result = await runQuery(`
       MATCH (a:Artist {mbid: $source}), (b:Artist {mbid: $target})
-      MATCH path = shortestPath((a)-[*..6]-(b))
+      MATCH path = shortestPath((a)-[:COLLABORATED_WITH*..10]-(b))
       RETURN [n IN nodes(path) | {id: id(n), type: labels(n)[0], label: coalesce(n.name, n.title, n.mbid), properties: properties(n)}] as nodes,
              [r IN relationships(path) | {source: id(startNode(r)), target: id(endNode(r)), type: type(r)}] as edges
     `, { source, target });

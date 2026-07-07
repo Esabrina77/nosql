@@ -141,7 +141,7 @@ export const Presentation: React.FC<PresentationProps> = ({ setPage }) => {
             </h4>
             <ul style={{ listStyleType: 'disc', paddingLeft: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <li>Développé en <strong>Node.js</strong> et <strong>TypeScript</strong>.</li>
-              <li>Connexion au graphe via le driver officiel <code>neo4j-driver</code> avec gestion robuste du pool de sessions.</li>
+              <li>Connexion au graphe via le driver officiel <code>neo4j-driver</code>.</li>
               <li>Validation des paramètres et gestion globale des codes erreurs HTTP.</li>
             </ul>
           </div>
@@ -229,47 +229,15 @@ export const Presentation: React.FC<PresentationProps> = ({ setPage }) => {
             <h4 style={{ color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Avantages du Docker Compose :</h4>
             <ul style={{ listStyleType: 'disc', paddingLeft: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
               <li>Lancement complet en une seule commande : <code>docker compose up --build</code>.</li>
-              <li>Isolation réseau complète pour les microservices.</li>
               <li>Persistance des données configurée via des volumes nommés pour Neo4j.</li>
             </ul>
           </div>
         </div>
       )
     },
-    // Slide 7: Interface Web (Critère Interface web - 3 points)
+    // Slide 7: Analyse Data & Démo Live (Critère Analyse data - 3 points)
     {
-      title: "6. L'Interface Web MusicGraph",
-      subtitle: "Design système moderne, intuitif et interactif",
-      type: "split",
-      content: (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '2rem', marginTop: '0.5rem' }}>
-          <div>
-            <h4 style={{ color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Esthétique Premium :</h4>
-            <ul style={{ listStyleType: 'disc', paddingLeft: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-              <li>Thème sombre moderne combinant <strong>glassmorphism</strong> et bordures subtiles.</li>
-              <li>Typographie soignée importée de Google Fonts (Inter &amp; Outfit).</li>
-              <li>Micro-animations fluides de survol et indicateurs de chargement interactifs.</li>
-            </ul>
-          </div>
-          <div className="glass-card" style={{ padding: '1.25rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-            <h4 style={{ color: 'var(--text-primary)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Tv size={16} color="var(--accent-primary)" /> Rendu Graphique
-            </h4>
-            <p>
-              L'intégration de la bibliothèque <code>vis-network</code> permet un rendu interactif en 2D Canvas :
-            </p>
-            <ul style={{ listStyleType: 'disc', paddingLeft: '1.2rem', marginTop: '0.35rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-              <li>Zoom et déplacement fluides.</li>
-              <li>Rendu basé sur la physique des forces (barnesHut).</li>
-              <li>Inspecteur latéral lors du clic sur un nœud.</li>
-            </ul>
-          </div>
-        </div>
-      )
-    },
-    // Slide 8: Analyse Data & Démo Live (Critère Analyse data - 3 points)
-    {
-      title: "7. Analyses de Données & Démo Live",
+      title: "6. Analyses de Données & Démo Live",
       subtitle: "Calculs en temps réel et exploration interactive",
       type: "split",
       content: (
@@ -306,9 +274,9 @@ export const Presentation: React.FC<PresentationProps> = ({ setPage }) => {
         </div>
       )
     },
-    // Slide 9: Conclusion & Rendu (Critère README & documentation - 3 points)
+    // Slide 8: Conclusion & Rendu (Critère README & documentation - 3 points)
     {
-      title: "8. Conclusion & Livrables",
+      title: "7. Conclusion & Livrables",
       subtitle: "Validation et conformité au cahier des charges",
       type: "intro",
       content: (
