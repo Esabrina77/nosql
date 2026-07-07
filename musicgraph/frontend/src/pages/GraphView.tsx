@@ -37,7 +37,8 @@ export const GraphView: React.FC = () => {
     Recording: true,
     Release: true,
     Genre: false,
-    Area: false
+    Area: false,
+    Label: false
   });
   const [physicsEnabled, setPhysicsEnabled] = useState(true);
 
@@ -185,7 +186,7 @@ export const GraphView: React.FC = () => {
                   })}
                   style={{ cursor: 'pointer' }}
                 />
-                <span>{type === 'Artist' ? 'Artistes' : type === 'Recording' ? 'Morceaux' : type === 'Release' ? 'Albums' : type === 'Genre' ? 'Genres' : 'Pays'}</span>
+                <span>{type === 'Artist' ? 'Artistes' : type === 'Recording' ? 'Morceaux' : type === 'Release' ? 'Albums' : type === 'Genre' ? 'Genres' : type === 'Area' ? 'Pays' : 'Labels'}</span>
               </label>
             ))}
           </div>
@@ -266,6 +267,10 @@ export const GraphView: React.FC = () => {
                 <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#10b981' }}></div>
                 <span>Pays (Area)</span>
               </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#f97316' }}></div>
+                <span>Labels (Label)</span>
+              </div>
             </div>
           </div>
 
@@ -337,6 +342,13 @@ export const GraphView: React.FC = () => {
                     <>
                       <div><span style={{ color: 'var(--text-muted)' }}>Nom :</span> {selectedNode.properties.name}</div>
                       <div><span style={{ color: 'var(--text-muted)' }}>Type géographique :</span> {selectedNode.properties.type || 'N/A'}</div>
+                    </>
+                  )}
+                  
+                  {selectedNode.type === 'Label' && (
+                    <>
+                      <div><span style={{ color: 'var(--text-muted)' }}>Nom :</span> {selectedNode.properties.name}</div>
+                      <div><span style={{ color: 'var(--text-muted)' }}>Pays :</span> {selectedNode.properties.country || 'N/A'}</div>
                     </>
                   )}
                   

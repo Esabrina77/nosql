@@ -49,6 +49,10 @@ export const NetworkGraph: React.FC<NetworkGraphProps> = ({ nodes, edges, onNode
           color = '#eab308'; // Yellow/Gold
           size = 15;
           break;
+        case 'Label':
+          color = '#f97316'; // Orange
+          size = 18;
+          break;
         case 'Area':
           color = '#10b981'; // Emerald Green
           size = 18;

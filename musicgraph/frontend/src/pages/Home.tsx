@@ -15,6 +15,32 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 export const Home: React.FC<{ setPage: (page: string) => void }> = ({ setPage }) => {
   const [stats, setStats] = useState<StatsOverview | null>(null);
   const [loading, setLoading] = useState(true);
+  const [resetting, setResetting] = useState(false);
+
+  const handleReset = async (action: 'clear' | 'seed') => {
+    const confirmMsg = action === 'clear' 
+      ? "Voulez-vous vraiment vider complètement la base de données Neo4j ?" 
+      : "Voulez-vous réinitialiser et recharger le jeu d'essai de démo dans Neo4j ?";
+      
+    if (window.confirm(confirmMsg)) {
+      setResetting(true);
+      try {
+        await fetch(`${API_URL}/reset`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action })
+        });
+        // Reload stats
+        const res = await fetch(`${API_URL}/stats/overview`);
+        const data = await res.json();
+        setStats(data);
+      } catch (err) {
+        console.error('Error resetting database:', err);
+      } finally {
+        setResetting(false);
+      }
+    }
+  };
 
   useEffect(() => {
     fetch(`${API_URL}/stats/overview`)
@@ -73,6 +99,25 @@ export const Home: React.FC<{ setPage: (page: string) => void }> = ({ setPage })
             <div style={{ cursor: 'pointer', padding: '0.75rem', borderRadius: 'var(--radius-md)', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)' }} onClick={() => setPage('stats')}>
               <strong>Statistiques data</strong>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Top collaborations et centralité des artistes.</p>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '0.5rem', borderTop: '1px dashed var(--border-color)', paddingTop: '1rem', marginTop: '0.25rem' }}>
+              <button 
+                className="btn btn-secondary" 
+                onClick={() => handleReset('clear')} 
+                disabled={resetting}
+                style={{ flex: 1, fontSize: '0.75rem', padding: '0.5rem 0.25rem', justifyContent: 'center', borderColor: 'rgba(239, 68, 68, 0.3)', color: '#f87171', background: 'rgba(239, 68, 68, 0.03)', cursor: resetting ? 'not-allowed' : 'pointer' }}
+              >
+                {resetting ? 'Reset...' : 'Vider la base'}
+              </button>
+              <button 
+                className="btn btn-primary" 
+                onClick={() => handleReset('seed')} 
+                disabled={resetting}
+                style={{ flex: 1, fontSize: '0.75rem', padding: '0.5rem 0.25rem', justifyContent: 'center', cursor: resetting ? 'not-allowed' : 'pointer' }}
+              >
+                {resetting ? 'Seeding...' : 'Seeder démo'}
+              </button>
             </div>
           </div>
         </div>

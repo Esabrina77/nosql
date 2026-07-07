@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import * as musicbrainz from '../services/musicbrainz';
 import { runQuery } from '../services/neo4j';
+import { seedDatabase } from '../services/seed';
 
 const router = Router();
 
@@ -127,8 +128,8 @@ router.post('/import/artists', async (req: Request, res: Response) => {
               country: credCountry
             });
 
-            const isFeature = /feat\.|featuring|ft\.|avec| x | & /.test(joinPhrase.toLowerCase()) || 
-                              /feat\.|featuring|ft\.|avec| x | & /.test(recTitle.toLowerCase());
+            const isFeature = /feat\.|featuring|ft\.|avec| x | & /.test(joinPhrase.toLowerCase()) ||
+              /feat\.|featuring|ft\.|avec| x | & /.test(recTitle.toLowerCase());
 
             const relType = isFeature ? 'FEATURED_ON' : 'PERFORMED';
 
@@ -445,14 +446,14 @@ router.get('/graph', async (req: Request, res: Response) => {
   try {
     const nodesResult = await runQuery(`
       MATCH (n)
-      WHERE n:Artist OR n:Recording OR n:Release OR n:Genre OR n:Area
+      WHERE n:Artist OR n:Recording OR n:Release OR n:Genre OR n:Area OR n:Label
       RETURN id(n) as id, labels(n)[0] as type, properties(n) as props
     `);
 
     const edgesResult = await runQuery(`
       MATCH (n)-[r]->(m)
-      WHERE (n:Artist OR n:Recording OR n:Release OR n:Genre OR n:Area)
-        AND (m:Artist OR m:Recording OR m:Release OR m:Genre OR m:Area)
+      WHERE (n:Artist OR n:Recording OR n:Release OR n:Genre OR n:Area OR n:Label)
+        AND (m:Artist OR m:Recording OR m:Release OR m:Genre OR m:Area OR m:Label)
       RETURN id(n) as source, id(m) as target, type(r) as type
     `);
 
@@ -682,6 +683,22 @@ router.get('/stats/top-recordings', async (req: Request, res: Response) => {
       artists: rec.get('artistsNames')
     })));
   } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/reset', async (req: Request, res: Response) => {
+  const { action } = req.body;
+  try {
+    console.log(`[API] Resetting database with action: ${action}`);
+    await runQuery('MATCH (n) DETACH DELETE n');
+    if (action === 'seed') {
+      await seedDatabase();
+    }
+
+    res.json({ success: true, message: `Database successfully reset with action "${action}"` });
+  } catch (error: any) {
+    console.error('Error resetting database:', error);
     res.status(500).json({ error: error.message });
   }
 });

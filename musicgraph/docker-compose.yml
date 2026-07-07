@@ -2,6 +2,7 @@ services:
   neo4j:
     image: neo4j:5.12.0-community
     container_name: musicgraph_neo4j
+    stop_grace_period: 30s
     ports:
       - "7474:7474" # Neo4j Browser
       - "7687:7687" # Bolt Protocol
